@@ -16,8 +16,15 @@ object SparkConceptsRunner {
             # Package a jar containing your application
             $ sbt package
 
+            # Run tests and package into jar
+            $ sbt test package
+
             # Use spark-submit to run your application
-            spark-submit --class SparkConceptsRunner --master yarn target/scala-2.12/sparkconcepts_2.12-0.1.0-SNAPSHOT.jar
+            spark-submit \
+                --class SparkConceptsRunner \
+                --jars /spark/deployment/dependencies/mysql-connector-j-8.0.31.jar \
+                --master yarn \
+                target/scala-2.12/sparkconcepts_2.12-0.1.0-SNAPSHOT.jar
         */
 
         println("#################################################################################")
@@ -223,6 +230,7 @@ object SparkConceptsRunner {
                 .format("jdbc")
                 .options(jdbcOptions)
                 .option("dbtable", "new_test")
+                .mode("append")
                 .save()
 
         println("Done")
