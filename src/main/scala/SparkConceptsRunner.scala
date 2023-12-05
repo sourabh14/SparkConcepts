@@ -1,6 +1,10 @@
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.functions.{col, udf}
 
+import java.io.FileNotFoundException
+import java.util.Properties
+import scala.io.Source
+
 object SparkConceptsRunner {
     def main(args: Array[String]) = {
         /*
@@ -169,6 +173,36 @@ object SparkConceptsRunner {
         println("Udf function in spark sql: ")
         sqlOutputDf2.show(sqlOutputDf2.count().toInt, false)
 
+        /*
+            Reading Properties file
+
+            datasource.url=jdbc:mysql://db.stgaddress-master.unicommerce.infra:3306/turbo
+            datasource.username=root
+            datasource.password=uniware
+            datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+         */
+
+        val url = getClass.getResource("application.properties")
+        val properties: Properties = new Properties()
+
+        if (url != null) {
+            val source = Source.fromURL(url)
+            properties.load(source.bufferedReader())
+        }
+        else {
+            println("Properties file cannot be loaded")
+            throw new FileNotFoundException("Properties file cannot be loaded");
+        }
+
+        val datasourceUrl = properties.getProperty("datasource.url")
+        val datasourceUsername = properties.getProperty("datasource.username")
+        val datasourcePassword = properties.getProperty("datasource.password")
+        val datasourceDriverClassName = properties.getProperty("datasource.driver-class-name")
+
+        println("datasourceUrl: " + datasourceUrl)
+        println("datasourceUsername: " + datasourceUsername)
+        println("datasourcePassword: " + datasourcePassword)
+        println("datasourceDriverClassName: " + datasourceDriverClassName)
 
         /*
             Spark JDBC
@@ -200,10 +234,10 @@ object SparkConceptsRunner {
               |""".stripMargin
 
         val jdbcOptions = Map(
-            "driver" -> "com.mysql.cj.jdbc.Driver",
-            "url" -> "jdbc:mysql://db.stgaddress-master.unicommerce.infra:3306/turbo",
-            "user" -> "root",
-            "password" -> "uniware"
+            "driver" -> datasourceDriverClassName,
+            "url" -> datasourceUrl,
+            "user" -> datasourceUsername,
+            "password" -> datasourcePassword
         )
 
         println("Fetching addresses from jdbc:")
@@ -226,12 +260,12 @@ object SparkConceptsRunner {
         newJdbcAddressDF.show(false)
 
         println("Writing new addresses to jdbc")
-        newJdbcAddressDF.write
-                .format("jdbc")
-                .options(jdbcOptions)
-                .option("dbtable", "new_test")
-                .mode("append")
-                .save()
+//        newJdbcAddressDF.write
+//                .format("jdbc")
+//                .options(jdbcOptions)
+//                .option("dbtable", "new_test")
+//                .mode("append")
+//                .save()
 
         println("Done")
         println("\n\n\n")
