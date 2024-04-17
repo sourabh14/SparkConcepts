@@ -9,6 +9,9 @@ object SparkConceptsRunner {
     def main(args: Array[String]) = {
         /*
           Spark Introduction
+            namenode.unicommerce.infra
+            cd ~/workspace/SparkConcepts
+
             # Using spark shell
             sudo su
             spark-shell --master yarn --name SparkTest
@@ -25,6 +28,7 @@ object SparkConceptsRunner {
 
             # Use spark-submit to run your application
             spark-submit \
+                --name "Spark Concepts Demo" \
                 --class SparkConceptsRunner \
                 --jars /spark/deployment/dependencies/mysql-connector-j-8.0.31.jar \
                 --master yarn \
@@ -213,8 +217,6 @@ object SparkConceptsRunner {
                 spark-submit --jars /spark/deployment/dependencies/mysql-connector-j-8.0.31.jar
 
                 jdbc:mysql://app1.stguat.unicommerce.infra:3306/uniware
-
-
          */
 
         val addressDetailsFetchQuery =
